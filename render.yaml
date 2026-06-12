@@ -1,32 +1,18 @@
 services:
-  - type: web
-    name: cat-oracle
-    env: python
-    buildCommand: curl -sL --max-time 120 https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz -o ffmpeg.tar.xz && tar -xf ffmpeg.tar.xz && mv ffmpeg-*/ffmpeg ./ && chmod +x ffmpeg && pip install -r requirements.txt
-    startCommand: python bot.py
-    runtime: python
-    pythonVersion: 3.12.0
-    envVars:
-      - key: BOT_TOKEN
-        sync: false
-      - key: ADMIN_ID
-        sync: false
-      - key: DATABASE_URL
-        sync: false
-
   - type: worker
     name: cat-oracle-vk
     env: python
-    buildCommand: curl -sL --max-time 120 https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz -o ffmpeg.tar.xz && tar -xf ffmpeg.tar.xz && mv ffmpeg-*/ffmpeg ./ && chmod +x ffmpeg && pip install -r requirements-vk.txt
+    buildCommand: pip install -r requirements-vk.txt
     startCommand: python vk_bot.py
-    runtime: python
-    pythonVersion: 3.12.0
+    pythonVersion: 3.12
     envVars:
       - key: VK_TOKEN
         sync: false
       - key: VK_GROUP_ID
-        sync: false
+        value: "190395599"
       - key: ADMIN_ID
-        sync: false
+        value: "1854526"
       - key: DATABASE_URL
-        sync: false
+        fromDatabase:
+          name: catwood-db
+          property: connectionString
