@@ -4,7 +4,9 @@ services:
     env: python
     region: frankfurt
     plan: free
-    buildCommand: pip install -r requirements-vk.txt
+    buildCommand: |
+      apt-get update -qq && apt-get install -y -qq ffmpeg
+      pip install -r requirements-vk.txt
     startCommand: python vk_bot.py
     envVars:
       - key: PYTHON_VERSION

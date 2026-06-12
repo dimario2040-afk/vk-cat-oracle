@@ -482,6 +482,10 @@ def _get_ffmpeg_path():
 
 FFMPEG_PATH = _get_ffmpeg_path()
 
+# log ffmpeg availability at startup for debugging
+if FFMPEG_PATH == "ffmpeg" and not any(os.path.exists(p) for p in ["ffmpeg", "/usr/bin/ffmpeg"]):
+    logger.warning("🌿 ffmpeg not found — video generation will be disabled")
+
 def _get_ffmpeg_semaphore():
     global _ffmpeg_semaphore
     if _ffmpeg_semaphore is None:
