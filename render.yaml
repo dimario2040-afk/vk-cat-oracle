@@ -2,6 +2,8 @@ services:
   - type: worker
     name: cat-oracle-vk
     env: python
+    region: frankfurt
+    plan: free
     buildCommand: pip install -r requirements-vk.txt
     startCommand: python vk_bot.py
     envVars:
