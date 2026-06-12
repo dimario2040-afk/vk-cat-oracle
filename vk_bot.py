@@ -1,5 +1,7 @@
 import logging, os, io, random, tempfile, urllib.request, asyncio, json, uuid, time, threading
 from http.server import HTTPServer, BaseHTTPRequestHandler
+
+_processed_ids = set()  # deduplicate message processing
 import asyncpg
 from datetime import datetime, timedelta
 import numpy as np
@@ -876,6 +878,8 @@ def _send_audio_msg(vk, peer_id, audio_path):
 async def handle_start(vk, event, lang):
     user_id = event.obj.message['from_id']
     text = event.obj.message.get('text', '')
+    msg_id = event.obj.message.get('conversation_message_id') or event.obj.message.get('id')
+    logger.info(f"handle_start: user={user_id}, msg_id={msg_id}, text='{text[:50]}'")
     await record_start()
     await _set_lang(user_id, "ru")
     referred_by = None
@@ -907,6 +911,8 @@ async def handle_start(vk, event, lang):
 async def handle_voice(vk, event, lang):
     user_id = event.obj.message['from_id']
     peer_id = event.obj.message['peer_id']
+    msg_id = event.obj.message.get('conversation_message_id') or event.obj.message.get('id')
+    logger.info(f"handle_voice: user={user_id}, msg_id={msg_id}")
     attachments = event.obj.message.get('attachments', [])
     audio_msg = None
     for a in attachments:
@@ -1102,6 +1108,12 @@ async def async_main():
                     text = (msg.get('text', '') or '').strip().lower()
                     peer_id = msg['peer_id']
                     user_id = msg['from_id']
+                    msg_id = msg.get('conversation_message_id') or msg.get('id')
+                    if msg_id and msg_id in _processed_ids:
+                        continue
+                    _processed_ids.add(msg_id)
+                    if len(_processed_ids) > 1000:
+                        _processed_ids.clear()
                     if user_id < 0:
                         continue  # skip messages from the group itself
                     lang = await _get_user_lang(user_id)
