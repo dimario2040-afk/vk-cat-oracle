@@ -957,7 +957,7 @@ async def handle_voice(vk, event, lang):
         legendary = action == "legendary"
         img = gen_card(cat, lang=lang, legendary=legendary)
         prefix = _text("totem_reveal_prefix", lang) if legendary else ""
-        ref_link = f"https://vk.com/club{VK_GROUP_ID}?w=all_ref_{user_id}"
+        ref_link = f"https://vk.com/club{VK_GROUP_ID}"
         caption = _text("totem_reveal", lang,
                         title=cat['title'], emoji=cat['emoji'],
                         name=cat['name'], desc=cat['description'],
@@ -986,7 +986,7 @@ async def _send_totem_video_async(vk, peer_id, img_data, cat, user_id, lang, voi
             return
         caption = _text("video_caption_text", lang,
                         name=cat['name'],
-                        ref=f"https://vk.com/club{VK_GROUP_ID}?w=all_ref_{user_id}")
+                        ref=f"https://vk.com/club{VK_GROUP_ID}")
         _send_doc(vk, peer_id, mp4, f"totem_{cat['id']}.mp4", caption=caption)
         logger.info(f"_send_totem_video_async: sent to user {user_id}")
     except Exception as e:
