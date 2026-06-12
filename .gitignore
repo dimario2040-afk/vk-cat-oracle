@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+.env
+bot.log
+test_*.py
+test_*.jpg
+test_*.png
+venv/
+.venv/
