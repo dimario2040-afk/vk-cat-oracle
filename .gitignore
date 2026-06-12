@@ -7,3 +7,9 @@ test_*.jpg
 test_*.png
 venv/
 .venv/
+
+_debug_*.py
+_test_*.py
+.omo/run-continuation/
+*.json
+start_bot.bat
