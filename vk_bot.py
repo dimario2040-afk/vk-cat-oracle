@@ -210,7 +210,7 @@ _T = {
                    "en": "🎉 *{{name}}* clicked your link!\nYou earned +1 reading 🐱"},
     "welcome_ref": {"ru": "🌿 *{{name}}, {{referrer}} позвал тебя в Зачарованный Лес...* 🌿\n\n70+ кошачьих духов ждут твой голос.\n\n🎤 *Нажми на микрофон и мяукни.*\n\n💬 Напиши /lang — переключить язык",
                     "en": "🌿 *{{name}}, {{referrer}} has summoned you to the Enchanted Woods...* 🌿\n\n70+ cat spirits await your voice.\n\n🎤 *Hit the mic and meow.*\n\n💬 Send /lang — switch language"},
-    "welcome_new": {"ru": "🌿 *{{name}}, ты стоишь на пороге Зачарованного Леса...* 🌿\n\n70+ кошачьих духов ждут твой голос.\n\n🎤 *Нажми на микрофон и мяукни.*\n\n💬 Напиши /lang — переключить язык",
+    "welcome_new": {"ru": "🌿 *{{name}}, ты стоишь на пороге Зачарованного Леса...* 🌿\n\n70+ кошачьих духов ждут твой голос.\n\n🎤 *Нажми на микрофон и мяукни.*",
                     "en": "🌿 *{{name}}, you stand at the edge of the Enchanted Woods...* 🌿\n\n70+ cat spirits await your voice.\n\n🎤 *Hit the mic and meow.*\n\n💬 Send /lang — switch language"},
     "totem_reveal": {"ru": "🌟 *{{title}}* 🌟\n\n{{emoji}} {{name}}\n{{desc}}\n\n🌀 Стихия: {{element}}\n\n👥 *Приведи друга — узнай, кто он:*\n{{ref}}",
                      "en": "🌟 *{{title}}* 🌟\n\n{{emoji}} {{name}}\n{{desc}}\n\n🌀 Element: {{element}}\n\n👥 *Bring a friend — find their totem:*\n{{ref}}"},
