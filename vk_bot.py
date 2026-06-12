@@ -963,7 +963,7 @@ async def handle_voice(vk, event, lang):
         legendary = action == "legendary"
         img = gen_card(cat, lang=lang, legendary=legendary)
         prefix = _text("totem_reveal_prefix", lang) if legendary else ""
-        ref_link = f"https://vk.com/club{VK_GROUP_ID}"
+        ref_link = f"https://vk.me/club{VK_GROUP_ID}"
         caption = _text("totem_reveal", lang,
                         title=cat['title'], emoji=cat['emoji'],
                         name=cat['name'], desc=cat['description'],
@@ -992,7 +992,7 @@ async def _send_totem_video_async(vk, peer_id, img_data, cat, user_id, lang, voi
             return
         caption = _text("video_caption_text", lang,
                         name=cat['name'],
-                        ref=f"https://vk.com/club{VK_GROUP_ID}")
+                        ref=f"https://vk.me/club{VK_GROUP_ID}")
         _send_doc(vk, peer_id, mp4, f"totem_{cat['id']}.mp4", caption=caption)
         logger.info(f"_send_totem_video_async: sent to user {user_id}")
     except Exception as e:
@@ -1049,7 +1049,7 @@ async def handle_callback(vk, event):
         data = _share_data.get(user_id)
         if data and "cat" in data:
             cat = data["cat"]
-            text = f"🐱 {cat['emoji']} {cat['title']} — {cat['name']}\n\n{cat['description']}\n\nУзнай своего кота! vk.com/club{VK_GROUP_ID}"
+            text = f"🐱 {cat['emoji']} {cat['title']} — {cat['name']}\n\n{cat['description']}\n\nУзнай своего кота! vk.me/club{VK_GROUP_ID}"
             _send_msg(vk, peer_id, text)
     elif ptype == "buy_unlimited":
         _send_msg(vk, peer_id, "⭐ Оплата через VK Pay будет добавлена позже.")
@@ -1134,7 +1134,7 @@ async def async_main():
                     elif cmd == "premium":
                         _send_msg(vk, peer_id, _text("premium_regular", lang,
                                                       remaining=str(3), bonus=str(0),
-                                                      ref=f"https://vk.com/club{VK_GROUP_ID}"),
+                                                      ref=f"https://vk.me/club{VK_GROUP_ID}"),
                                   keyboard=keyboard_premium(lang))
                     else:
                         await handle_start(vk, event, lang)
