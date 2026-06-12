@@ -1,4 +1,5 @@
-import logging, os, io, random, tempfile, urllib.request, asyncio, json, uuid, time
+import logging, os, io, random, tempfile, urllib.request, asyncio, json, uuid, time, threading
+from http.server import HTTPServer, BaseHTTPRequestHandler
 import asyncpg
 from datetime import datetime, timedelta
 import numpy as np
@@ -1064,12 +1065,31 @@ CMD_MAP = {
 }
 
 
+class HealthHandler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.send_header("Content-type", "text/plain")
+        self.end_headers()
+        self.wfile.write(b"OK")
+
+    def log_message(self, fmt, *args):
+        logger.debug(f"Health: {fmt % args}")
+
+def _start_health_server():
+    port = int(os.environ.get("PORT", 10000))
+    server = HTTPServer(("0.0.0.0", port), HealthHandler)
+    logger.info(f"🌿 Health server on port {port}")
+    server.serve_forever()
+
+
 async def async_main():
     logger.info("🌿 The Forest Spirit awakens (VK Edition)...")
     if not VK_TOKEN or not VK_GROUP_ID:
         logger.error("VK_TOKEN or VK_GROUP_ID not set. Exiting.")
         return
     await init_db()
+    t = threading.Thread(target=_start_health_server, daemon=True)
+    t.start()
     vk_session = vk_api.VkApi(token=VK_TOKEN)
     vk = vk_session.get_api()
     longpoll = VkBotLongPoll(vk_session, VK_GROUP_ID)
