@@ -792,7 +792,6 @@ def keyboard_start(lang="ru"):
     kb.add_button("📊 Статистика", color=VkKeyboardColor.SECONDARY)
     kb.add_button("⭐ Премиум", color=VkKeyboardColor.POSITIVE)
     kb.add_line()
-    kb.add_button("💬 Язык / Lang", color=VkKeyboardColor.SECONDARY)
     kb.add_button("❓ Помощь", color=VkKeyboardColor.SECONDARY)
     return kb.get_keyboard()
 
@@ -801,12 +800,6 @@ def keyboard_main(cat, lang="ru"):
     kb.add_callback_button(_text("btn_save", lang), color=VkKeyboardColor.PRIMARY, payload=json.dumps({"type": "save_card"}))
     kb.add_line()
     kb.add_callback_button(_text("btn_share_friends", lang), color=VkKeyboardColor.POSITIVE, payload=json.dumps({"type": "share"}))
-    return kb.get_keyboard()
-
-def keyboard_lang():
-    kb = VkKeyboard(one_time=False, inline=True)
-    kb.add_callback_button("🇷🇺 Русский", color=VkKeyboardColor.PRIMARY, payload=json.dumps({"type": "lang_sel_ru"}))
-    kb.add_callback_button("🇬🇧 English", color=VkKeyboardColor.SECONDARY, payload=json.dumps({"type": "lang_sel_en"}))
     return kb.get_keyboard()
 
 def keyboard_premium(lang="ru"):
@@ -883,10 +876,7 @@ async def handle_start(vk, event, lang):
     user_id = event.obj.message['from_id']
     text = event.obj.message.get('text', '')
     await record_start()
-    stored = await _get_lang(user_id)
-    if not stored:
-        _send_msg(vk, user_id, _text("lang_prompt", "ru"), keyboard=keyboard_lang())
-        return
+    await _set_lang(user_id, "ru")
     referred_by = None
     if text.startswith("ref_"):
         referrer_id = int(text[4:])
@@ -898,19 +888,19 @@ async def handle_start(vk, event, lang):
                 if not existing:
                     await _add_bonus(referrer_id, 1)
                     await conn.execute("INSERT INTO referrals(referrer_id, referee_id, ts) VALUES($1,$2,NOW())", referrer_id, referee_id)
-                    referred_by = "друг" if lang == "ru" else "someone"
+                    referred_by = "друг"
                     try:
                         vk.messages.send(
                             peer_id=referrer_id,
                             random_id=get_random_id(),
-                            message=_text("ref_notify", lang, name="пользователь"),
+                            message=_text("ref_notify", "ru", name="пользователь"),
                         )
                     except:
                         pass
     if referred_by:
-        _send_msg(vk, user_id, _text("welcome_ref", lang, name="Странник", referrer=referred_by), keyboard=keyboard_start(lang))
+        _send_msg(vk, user_id, _text("welcome_ref", "ru", name="Странник", referrer=referred_by), keyboard=keyboard_start("ru"))
     else:
-        _send_msg(vk, user_id, _text("welcome_new", lang, name="Странник"), keyboard=keyboard_start(lang))
+        _send_msg(vk, user_id, _text("welcome_new", "ru", name="Странник"), keyboard=keyboard_start("ru"))
 
 
 async def handle_voice(vk, event, lang):
@@ -1021,11 +1011,7 @@ def handle_help(vk, event, lang):
 
 
 async def handle_lang(vk, event, lang):
-    user_id = event.obj.message['from_id']
-    current = await _get_lang(user_id) or "ru"
-    new_lang = "en" if current == "ru" else "ru"
-    await _set_lang(user_id, new_lang)
-    _send_msg(vk, user_id, _text("lang_set", new_lang))
+    pass
 
 
 async def handle_callback(vk, event):
@@ -1040,14 +1026,8 @@ async def handle_callback(vk, event):
         except:
             return
     ptype = payload.get('type', '')
-    lang = await _get_user_lang(user_id)
-    if ptype == "lang_sel_ru":
-        await _set_lang(user_id, "ru")
-        _send_msg(vk, peer_id, _text("lang_welcome_ru", "ru", name="Странник"), keyboard=keyboard_start("ru"))
-    elif ptype == "lang_sel_en":
-        await _set_lang(user_id, "en")
-        _send_msg(vk, peer_id, _text("lang_welcome_en", "en", name="Wanderer"), keyboard=keyboard_start("en"))
-    elif ptype == "save_card":
+    lang = "ru"
+    if ptype == "save_card":
         data = _share_data.get(user_id)
         if data and "peer_id" in data:
             try:
@@ -1081,8 +1061,6 @@ CMD_MAP = {
     "статистика": "stats",
     "premium": "premium",
     "премиум": "premium",
-    "lang": "lang",
-    "язык": "lang",
 }
 
 
@@ -1104,6 +1082,8 @@ async def async_main():
                     text = (msg.get('text', '') or '').strip().lower()
                     peer_id = msg['peer_id']
                     user_id = msg['from_id']
+                    if user_id < 0:
+                        continue  # skip messages from the group itself
                     lang = await _get_user_lang(user_id)
                     attachments = msg.get('attachments', [])
                     has_audio = any(a.get('type') == 'audio_message' for a in attachments)
@@ -1124,8 +1104,6 @@ async def async_main():
                                                       remaining=str(3), bonus=str(0),
                                                       ref=f"https://vk.com/club{VK_GROUP_ID}"),
                                   keyboard=keyboard_premium(lang))
-                    elif cmd == "lang":
-                        await handle_lang(vk, event, lang)
                     else:
                         await handle_start(vk, event, lang)
                 elif event.type == VkBotEventType.MESSAGE_EVENT:
