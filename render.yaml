@@ -7,6 +7,8 @@ services:
     buildCommand: pip install -r requirements-vk.txt
     startCommand: python vk_bot.py
     envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.11"
       - key: VK_TOKEN
         sync: false
       - key: VK_GROUP_ID
